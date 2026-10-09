@@ -13,6 +13,11 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 
+# Importer ``models`` pour que SQLAlchemy enregistre le mapping des tables
+# applicatives sur ``Base.metadata``. Nécessaire pour que
+# ``alembic revision --autogenerate`` détecte les modèles (sinon la table
+# est absente du diff et aucune révision n'est générée).
+import chess_analyzer.models  # noqa: F401
 from chess_analyzer.config import get_settings
 
 settings = get_settings()
