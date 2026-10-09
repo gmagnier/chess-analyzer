@@ -33,7 +33,7 @@ Conventional Commits : `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`.
 ### outillage
 
 - `.github/pull_request_template.md` — checklist de PR
-- `.github/dependabot.yml` — mises à jour des GitHub Actions
+- `.github/dependabot.yml` — mises à jour des GitHub Actions + dépendances pip
 
 ## Quickstart
 
