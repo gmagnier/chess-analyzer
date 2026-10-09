@@ -43,7 +43,6 @@ def client(tmp_path: Path) -> Generator[TestClient, None, None]:
         autoflush=False,
         autocommit=False,
         expire_on_commit=False,
-        future=True,
     )
 
     def _override_get_db() -> Generator[Session, None, None]:
@@ -79,9 +78,10 @@ def _create_alembic_managed_engine(db_file: Path) -> Engine:
 
     db_url = f"sqlite:///{db_file}"
 
-    # Configure Alembic avec l'URL de la DB jetable. ``env.py`` construit
-    # son propre engine via ``make_engine(url)`` et applique les migrations.
-    # On réutilise le même engine ensuite pour la session de test.
+    # ``env.py`` construit son propre engine via ``make_engine(url)`` et
+    # applique les migrations. On construit ensuite un engine séparé pour
+    # la session de test (mêmes kwargs, juste un pool distinct). Les deux
+    # engines partagent la même DB SQLite sur disque.
     alembic_cfg = AlembicConfig(str(Path(__file__).parents[1] / "alembic.ini"))
     alembic_cfg.set_main_option("sqlalchemy.url", db_url.replace("%", "%%"))
     alembic_command.upgrade(alembic_cfg, "head")

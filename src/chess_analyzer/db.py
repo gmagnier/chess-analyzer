@@ -32,6 +32,10 @@ def make_engine(url: str, **kwargs: Any) -> Engine:
     """
 
     parsed_url = make_url(url)
+    # ``future=True`` est le défaut SQLAlchemy 2.x et ne peut pas être
+    # surchargé (refus explicite pour éviter une régression silencieuse
+    # vers le style 1.x si un appelant passe future=False).
+    kwargs.pop("future", None)
     engine_kwargs: dict[str, Any] = {"future": True, **kwargs}
     if parsed_url.get_backend_name() == "sqlite" and "connect_args" not in engine_kwargs:
         engine_kwargs["connect_args"] = {"check_same_thread": False}

@@ -31,8 +31,8 @@ def upgrade() -> None:
         sa.Column("fen", sa.String(length=120), nullable=False),
         sa.Column(
             "created_at",
-            sa.DateTime(),
-            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
             nullable=False,
         ),
         sa.PrimaryKeyConstraint("fen"),
@@ -40,6 +40,11 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Supprime la table ``positions``."""
+    """Supprime la table ``positions``.
+
+    WARNING: Destructif — ``DROP TABLE`` efface toutes les lignes. Sûr
+    uniquement tant que la table est vide (cas attendu pour cette
+    migration d'amorçage, à revisiter quand des données seront ingérées).
+    """
 
     op.drop_table("positions")

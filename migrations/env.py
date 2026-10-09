@@ -38,6 +38,9 @@ config = context.config
 # permettre d'exécuter les migrations contre une DB jetable sans monkeypatch
 # sur l'environnement.
 _configured_url = config.get_main_option("sqlalchemy.url")
+# Le placeholder par défaut dans ``alembic.ini`` est un commentaire
+# (``sqlalchemy.url = # ...``) que ConfigParser stocke tel quel. On le
+# détecte pour fallback sur les settings de l'application.
 if not _configured_url or _configured_url.strip().startswith("#"):
     database_url = get_settings().database_url
     # ConfigParser interprète les %, y compris ceux des identifiants encodés.
