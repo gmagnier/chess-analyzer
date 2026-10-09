@@ -29,7 +29,8 @@ _HTML_INDEX = """<!doctype html>
   <body>
     <main>
       <h1>chess-analyzer</h1>
-      <p>Squelette du projet en place. Endpoint de sant&eacute; : <a href="/healthz">/healthz</a>.</p>
+      <p>Squelette du projet en place. Endpoint de sant&eacute; :
+        <a href="/healthz">/healthz</a>.</p>
     </main>
   </body>
 </html>
