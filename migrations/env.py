@@ -23,7 +23,8 @@ config = context.config
 # On surcharge sqlalchemy.url avec la valeur de l'application, pour qu'une
 # seule source de vérité configure la base (Settings + .env).
 database_url = get_settings().database_url
-config.set_main_option("sqlalchemy.url", database_url)
+# ConfigParser interprète les %, y compris ceux des identifiants encodés.
+config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
