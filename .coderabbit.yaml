@@ -1,0 +1,14 @@
+# Configuration CodeRabbit — chess-analyzer
+# https://docs.coderabbit.ai/guides/configure
+#
+# Le projet utilise `develop` comme branche d'intégration (cf. README.md),
+# pas la branche par défaut du dépôt. Sans ce fichier, CodeRabbit saute
+# automatiquement les PRs qui ciblent `develop` (comportement par défaut).
+# Cette config lui dit explicitement de relire develop + les branches
+# de release.
+
+reviews:
+  auto_review:
+    base_branches:
+      - develop
+      - "release/.*"
