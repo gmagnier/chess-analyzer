@@ -8,11 +8,11 @@ from __future__ import annotations
 
 from collections.abc import Generator
 from pathlib import Path
-from typing import Final
+from typing import Any, Final
 from urllib.parse import unquote, urlsplit
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import make_url
+from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from chess_analyzer.config import get_settings
@@ -22,19 +22,26 @@ class Base(DeclarativeBase):
     """Base déclarative pour tous les modèles SQLAlchemy du projet."""
 
 
+def make_engine(url: str, **kwargs: Any) -> Engine:
+    """Construit un ``Engine`` SQLAlchemy à partir d'une URL.
+
+    Encapsule le conditionnel SQLite (``check_same_thread=False``) et force
+    le style 2.x (``future=True``). C'est le point central pour les kwargs
+    partagés entre l'application et les migrations Alembic — éviter la
+    duplication entre ``db.py`` et ``migrations/env.py`` (cf. deferred D1.2).
+    """
+
+    parsed_url = make_url(url)
+    engine_kwargs: dict[str, Any] = {"future": True, **kwargs}
+    if parsed_url.get_backend_name() == "sqlite" and "connect_args" not in engine_kwargs:
+        engine_kwargs["connect_args"] = {"check_same_thread": False}
+    return create_engine(parsed_url, **engine_kwargs)
+
+
 _settings = get_settings()
 _database_url = make_url(_settings.database_url)
 
-# SQLite a besoin de `check_same_thread=False` pour être utilisé depuis
-# plusieurs threads (FastAPI workers / tests). On laisse SQLAlchemy gérer
-# la sérialisation des écritures via le pool.
-_engine_kwargs: Final[dict] = (
-    {"connect_args": {"check_same_thread": False}, "future": True}
-    if _database_url.get_backend_name() == "sqlite"
-    else {"future": True}
-)
-
-engine = create_engine(_database_url, **_engine_kwargs)
+engine = make_engine(_settings.database_url)
 
 
 # Si la base est un fichier SQLite, on crée le répertoire parent s'il
