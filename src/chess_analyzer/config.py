@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # Chemin SQLite par défaut, relatif à la racine du dépôt.
     database_url: str = Field(
         default="sqlite:///./data/chess_analyzer.db",
+        min_length=1,
         description="URL SQLAlchemy de la base de données.",
     )
 

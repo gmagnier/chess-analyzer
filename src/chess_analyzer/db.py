@@ -7,6 +7,7 @@ une dépendance FastAPI pour ouvrir/fermer une session par requête.
 from __future__ import annotations
 
 from collections.abc import Generator
+from pathlib import Path
 from typing import Final
 
 from sqlalchemy import create_engine
@@ -31,6 +32,19 @@ _engine_kwargs: Final[dict] = (
 )
 
 engine = create_engine(_settings.database_url, **_engine_kwargs)
+
+
+# Si la base est un fichier SQLite, on crée le répertoire parent s'il
+# n'existe pas — SQLAlchemy ne le fait pas automatiquement et un volume
+# vide (Docker, CI fresh) ne contiendrait pas `data/`. No-op pour les
+# URL non-fichier (sqlite:///:memory:, postgresql://, etc.).
+if _settings.database_url.startswith("sqlite") and ":memory:" not in _settings.database_url:
+    # Extraire le chemin du fichier depuis l'URL (sqlite:///./data/...).
+    db_path_str = _settings.database_url.split("///", 1)[-1]
+    db_path = Path(db_path_str)
+    if not db_path.is_absolute():
+        db_path = Path.cwd() / db_path
+    db_path.parent.mkdir(parents=True, exist_ok=True)
 
 SessionLocal: Final[sessionmaker[Session]] = sessionmaker(
     bind=engine,

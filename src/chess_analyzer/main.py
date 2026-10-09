@@ -44,8 +44,24 @@ async def root() -> HTMLResponse:
     return HTMLResponse(content=_HTML_INDEX)
 
 
+# Variante HEAD : renvoyée par les sondes Kubernetes/ALB qui utilisent HEAD
+# par défaut. FastAPI ne déduit pas HEAD depuis GET, d'où le doublon.
+@app.head("/", include_in_schema=False)
+async def root_head() -> HTMLResponse:
+    """Variante HEAD de la racine (sondes probe-friendly)."""
+
+    return HTMLResponse(content=_HTML_INDEX)
+
+
 @app.get("/healthz", response_class=JSONResponse)
 async def healthz() -> JSONResponse:
     """Sonde de vie : renvoie ``{"status": "ok"}``."""
+
+    return JSONResponse({"status": "ok"})
+
+
+@app.head("/healthz")
+async def healthz_head() -> JSONResponse:
+    """Variante HEAD de la sonde de vie (sondes probe-friendly)."""
 
     return JSONResponse({"status": "ok"})

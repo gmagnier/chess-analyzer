@@ -19,11 +19,12 @@ depends_on = None
 
 def upgrade() -> None:
     """Schéma initial vide — ancêtre de la chaîne de migrations."""
-
-    pass
+    # Deliberately empty : no application tables yet (Jalon 0). Future
+    # jalons will introduce the first models via ``alembic revision
+    # --autogenerate -m "..."``.
+    return None
 
 
 def downgrade() -> None:
     """Revenir à l'état d'avant cette révision (aucun schéma à défaire)."""
-
-    pass
+    return None
